@@ -1,0 +1,833 @@
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-dark: #3a5982;
+            --secondary-color: #f9a826;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+            --background-color: #f0f2f5;
+            --text-color: #2c3e50;
+            --container-bg: white;
+            --question-bg: #f5f7fa;
+            --label-bg: white;
+            --label-border: #e0e0e0;
+            --label-hover-bg: #e8f4fd;
+            --input-border: #ddd;
+            --result-bg: #e8f7ee;
+            --participant-hover: #f8f9fa;
+            --leaderboard-item-hover: #f5f9ff;
+            --answers-details-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-theme {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --question-bg: #2d2d2d;
+            --dark-color: #e0e0e0;
+            --light-color: #2d2d2d;
+            --label-bg: #333333;
+            --label-border: #444444;
+            --label-hover-bg: #3a506b;
+            --input-border: #444444;
+            --result-bg: #1e3a2d;
+            --participant-hover: #2d2d2d;
+            --leaderboard-item-hover: #2a3a4d;
+            --answers-details-bg: #2d2d2d;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            position: relative;
+        }
+
+        h2:after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--secondary-color);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        .question {
+            margin-bottom: 25px;
+            background-color: var(--question-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+
+        .question:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .question p {
+            font-weight: 600;
+            margin-top: 0;
+            color: var(--dark-color);
+            font-size: 18px;
+        }
+
+        .question-options {
+            margin-top: 15px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: var(--label-bg);
+            border: 1px solid var(--label-border);
+            transition: all 0.2s;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        label:hover {
+            background-color: var(--label-hover-bg);
+            border-color: var(--primary-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: var(--label-bg);
+            color: var(--text-color);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--result-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .participants {
+            margin-top: 40px;
+            background-color: var(--container-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .participants h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .participant {
+            padding: 15px;
+            border-bottom: 1px solid var(--label-border);
+            transition: background-color 0.2s;
+        }
+
+        .participant:hover {
+            background-color: var(--participant-hover);
+        }
+
+        .participant:last-child {
+            border-bottom: none;
+        }
+
+        .correct {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: var(--error-color);
+            font-weight: bold;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--label-border);
+            background-color: var(--label-bg);
+        }
+
+        .result-item.correct {
+            border-left-color: var(--success-color);
+            background-color: rgba(39, 174, 96, 0.1);
+        }
+
+        .dark-theme .result-item.correct {
+            background-color: rgba(39, 174, 96, 0.2);
+        }
+
+        .result-item.incorrect {
+            border-left-color: var(--error-color);
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .dark-theme .result-item.incorrect {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .correct-icon {
+            color: var(--success-color);
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+        .incorrect-icon {
+            color: var(--error-color);
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            margin-left: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .timestamp {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-left: 10px;
+        }
+
+        .dark-theme .timestamp {
+            color: #a0a0a0;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .name-input-group {
+            margin-bottom: 25px;
+        }
+
+        .name-input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .restart-btn {
+            background: var(--success-color);
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #219653;
+        }
+
+        #leaderboard {
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--container-bg);
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--label-border);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: var(--text-color);
+        }
+
+        .leaderboard-item:hover {
+            background-color: var(--leaderboard-item-hover);
+        }
+
+        .rank {
+            width: 10%;
+            font-weight: bold;
+        }
+
+        .name {
+            width: 40%;
+            font-weight: 500;
+        }
+
+        .score {
+            width: 20%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .date {
+            width: 30%;
+            text-align: right;
+            color: #7f8c8d;
+        }
+
+        .dark-theme .date {
+            color: #a0a0a0;
+        }
+
+        .top-scorer {
+            background-color: rgba(249, 168, 38, 0.15);
+        }
+
+        .dark-theme .top-scorer {
+            background-color: rgba(249, 168, 38, 0.25);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        .view-results-btn {
+            background: #9b59b6;
+        }
+
+        .view-results-btn:hover {
+            background: #8e44ad;
+        }
+
+        .answers-details {
+            padding: 15px 20px;
+            background-color: var(--answers-details-bg);
+            border-radius: 8px;
+            margin-top: 5px;
+            border-left: 3px solid var(--primary-color);
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .final-score {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .quiz-progress {
+            position: relative;
+            margin-bottom: 30px;
+            height: 10px;
+            background-color: var(--label-border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Animacje */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px 15px;
+                padding: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .leaderboard-header, .leaderboard-item {
+                font-size: 14px;
+            }
+        }
+
+        /* Toggle dla ciemnego motywu */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark-color);
+            width: auto;
+            padding: 5px;
+        }
+    </style>
+
+    <script>
+        // Funkcja do uzyskiwania wszystkich zapisanych wyników
+        function getAllResults() {
+            try {
+                const resultsString = localStorage.getItem('quizResults');
+                return resultsString ? JSON.parse(resultsString) : [];
+            } catch (e) {
+                console.error('Błąd parsowania wyników quizu:', e);
+                return [];
+            }
+        }
+
+        // Funkcja do zapisywania wyników w localStorage
+        function saveResult(name, score, answers) {
+            const results = getAllResults();
+            const timestamp = new Date().toISOString();
+
+            results.push({
+                name: name,
+                score: score,
+                answers: answers,
+                timestamp: timestamp
+            });
+
+            localStorage.setItem('quizResults', JSON.stringify(results));
+        }
+
+        // Funkcja do wyświetlania wszystkich wyników
+        function displayAllResults() {
+            const results = getAllResults();
+            const participantsDiv = document.getElementById('participantsList');
+
+            if (results.length === 0) {
+                participantsDiv.innerHTML = '<h3>Wyniki uczestników</h3><p>Brak wyników do wyświetlenia</p>';
+                return;
+            }
+
+            // Sortowanie według punktów (od najwyższego)
+            results.sort((a, b) => b.score - a.score);
+
+            let html = '<h3>Wyniki uczestników</h3>';
+            html += '<div id="leaderboard">';
+            html += '<div class="leaderboard-header">';
+            html += '<div class="rank">Nr</div>';
+            html += '<div class="name">Uczestnik</div>';
+            html += '<div class="score">Punkty</div>';
+            html += '<div class="date">Data</div>';
+            html += '</div>';
+
+            results.forEach((result, index) => {
+                const date = new Date(result.timestamp);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                const isTopScorer = index === 0 ? 'top-scorer' : '';
+
+                html += `<div class="leaderboard-item ${isTopScorer}" onclick="toggleDetails('details-${index}')">`;
+                html += `<div class="rank">${index + 1}</div>`;
+                html += `<div class="name">${result.name}</div>`;
+                html += `<div class="score">${result.score}/10</div>`;
+                html += `<div class="date">${formattedDate}</div>`;
+                html += `</div>`;
+
+                // Szczegółowe odpowiedzi (początkowo ukryte)
+                html += `<div id="details-${index}" class="answers-details" style="display:none;">`;
+                html += result.answers.join('<br>');
+                html += '</div>';
+            });
+
+            html += '</div>';
+            participantsDiv.innerHTML = html;
+        }
+
+        // Funkcja do pokazywania/ukrywania szczegółów odpowiedzi
+        function toggleDetails(id) {
+            const details = document.getElementById(id);
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        // Funkcja do sprawdzania odpowiedzi
+        function checkAnswers(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            if (!name) {
+                alert('Proszę podać swoje imię i nazwisko');
+                return;
+            }
+
+            let correctAnswers = {
+                q1: "Paryż",
+                q2: "Japonia",
+                q3: "Hawaje",
+                q4: "Mona Lisa",
+                q5: "Odyseja",
+                q6: "Wielki Mur Chiński",
+                q7: "Leonardo da Vinci",
+                q8: "Mount Everest",
+                q9: "Himalaje",
+                q10: "Delfin"
+            };
+
+            let score = 0;
+            let participantAnswers = [];
+            let results = "<h3>Twoje wyniki:</h3>";
+
+            // Sprawdzanie odpowiedzi
+            for (let key in correctAnswers) {
+                let selected = document.querySelector(`input[name="${key}"]:checked`);
+                let answerText = selected ? selected.value : "Nie wybrano odpowiedzi";
+
+                // Dodawanie informacji, czy odpowiedź była poprawna
+                let isCorrect = selected && selected.value === correctAnswers[key];
+                if (isCorrect) score++;
+
+                let questionNumber = key.replace('q', '');
+                let questionElement = document.querySelector(`.question p[data-question="${key}"]`);
+                let questionText = questionElement ? questionElement.textContent : `Pytanie ${questionNumber}`;
+
+                let answerWithResult = `${questionNumber}. ${answerText} ${isCorrect ? '✅' : '❌'}`;
+                participantAnswers.push(answerWithResult);
+
+                // Jeśli odpowiedź jest poprawna
+                let resultClass = isCorrect ? 'correct' : 'incorrect';
+                let icon = isCorrect ? '✅' : '❌';
+
+                results += `<div class="result-item ${resultClass}">`;
+                results += `<span class="${resultClass}-icon">${icon}</span> <strong>Pyt. ${questionNumber}:</strong> `;
+
+                if (isCorrect) {
+                    results += `Poprawna odpowiedź: ${answerText}`;
+                } else if (selected) {
+                    results += `Niepoprawna odpowiedź! (Twoja: ${answerText}, Prawidłowa: ${correctAnswers[key]})`;
+                } else {
+                    results += `Brak odpowiedzi! (Prawidłowa: ${correctAnswers[key]})`;
+                }
+
+                results += `</div>`;
+            }
+
+            results += `<div class="final-score">Zdobyłeś ${score} / 10 punktów</div>`;
+            results += `<div class="action-buttons">
+                <button class="restart-btn" onclick="restartQuiz()">Rozwiąż quiz ponownie</button>
+                <button class="view-results-btn" onclick="viewAllResults()">Zobacz wszystkie wyniki</button>
+            </div>`;
+
+            document.getElementById("results").innerHTML = results;
+
+            // Zapisujemy wyniki
+            saveResult(name, score, participantAnswers);
+
+            // Ukrywamy formularz i pokazujemy wyniki
+            document.getElementById("quizForm").style.display = "none";
+            document.getElementById("results").style.display = "block";
+            document.getElementById("participantsList").style.display = "none";
+
+            // Aktualizujemy wyświetlanie wszystkich wyników
+            displayAllResults();
+        }
+
+        // Funkcja do ponownego uruchomienia quizu
+        function restartQuiz() {
+            document.getElementById("quizForm").reset();
+            document.getElementById("quizForm").style.display = "block";
+            document.getElementById("results").style.display = "none";
+            document.getElementById("participantsList").style.display = "block";
+        }
+
+        // Funkcja do wyświetlania wszystkich wyników
+        function viewAllResults() {
+            document.getElementById("participantsList").style.display = "block";
+        }
+
+        // Funkcja do czyszczenia wszystkich wyników (dla administratora)
+        function clearAllResults() {
+            if (confirm('Czy na pewno chcesz usunąć wszystkie wyniki quizu?')) {
+                localStorage.removeItem('quizResults');
+                displayAllResults();
+            }
+        }
+
+        // Inicjalizacja po załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("quizForm").style.display = "block";
+            document.getElementById("results").style.display = "none";
+            displayAllResults();
+
+            // Aktualizacja paska postępu przy zaznaczaniu odpowiedzi
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.addEventListener('change', updateProgress);
+            });
+
+            updateProgress(); // początkowa aktualizacja
+        });
+
+        // Funkcja do aktualizacji paska postępu
+        function updateProgress() {
+            const totalQuestions = 10;
+            let answeredQuestions = 0;
+
+            // Zliczanie zaznaczonych odpowiedzi
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) answeredQuestions++;
+            }
+
+            // Aktualizacja paska postępu
+            const progressBar = document.querySelector('.progress-bar');
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Оптимизированная функция переключения темы
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const themeToggle = document.getElementById('themeToggle');
+
+            if (document.body.classList.contains('dark-theme')) {
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Sprawdzanie preferencji motywu przy ładowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.getElementById('themeToggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.textContent = '🌙';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container fade-in">
+        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()">☀️</button>
+
+        <div class="quiz-header">
+            <h2>Quiz Wiedzy Ogólnej</h2>
+        </div>
+
+        <form id="quizForm" onsubmit="checkAnswers(event)">
+            <div class="name-input-group">
+                <label for="name">Twoje imię i nazwisko:</label>
+                <input type="text" id="name" name="name" required placeholder="Wpisz imię i nazwisko">
+            </div>
+
+            <div class="quiz-progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="question">
+                <p data-question="q1">1. Które miasto jest stolicą Francji?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q1" value="Paryż"> Paryż</label>
+                    <label><input type="radio" name="q1" value="Londyn"> Londyn</label>
+                    <label><input type="radio" name="q1" value="Berlin"> Berlin</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q2">2. Który kraj słynie z kwitnących wiśni?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q2" value="Japonia"> Japonia</label>
+                    <label><input type="radio" name="q2" value="Chiny"> Chiny</label>
+                    <label><input type="radio" name="q2" value="Indie"> Indie</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q3">3. Na której wyspie znajduje się Honolulu?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q3" value="Hawaje"> Hawaje</label>
+                    <label><input type="radio" name="q3" value="Azory"> Azory</label>
+                    <label><input type="radio" name="q3" value="Malediwy"> Malediwy</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q4">4. Które dzieło Leonarda da Vinci jest najbardziej znane?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q4" value="Mona Lisa"> Mona Lisa</label>
+                    <label><input type="radio" name="q4" value="Ostatnia Wieczerza"> Ostatnia Wieczerza</label>
+                    <label><input type="radio" name="q4" value="Dama z gronostajem"> Dama z gronostajem</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q5">5. Która z tych książek została napisana przez Homera?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q5" value="Iliada"> Iliada</label>
+                    <label><input type="radio" name="q5" value="Odyseja"> Odyseja</label>
+                    <label><input type="radio" name="q5" value="Eneida"> Eneida</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q6">6. Która z tych budowli znajduje się w Chinach?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q6" value="Wielki Mur Chiński"> Wielki Mur Chiński</label>
+                    <label><input type="radio" name="q6" value="Wieża Eiffla"> Wieża Eiffla</label>
+                    <label><input type="radio" name="q6" value="Koloseum"> Koloseum</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q7">7. Kto namalował "Ostatnią Wieczerzę"?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q7" value="Leonardo da Vinci"> Leonardo da Vinci</label>
+                    <label><input type="radio" name="q7" value="Vincent van Gogh"> Vincent van Gogh</label>
+                    <label><input type="radio" name="q7" value="Pablo Picasso"> Pablo Picasso</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q8">8. Jak nazywa się najwyższa góra świata?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q8" value="Mount Everest"> Mount Everest</label>
+                    <label><input type="radio" name="q8" value="K2"> K2</label>
+                    <label><input type="radio" name="q8" value="Makalu"> Makalu</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q9">9. W jakim paśmie górskim znajduje się Mount Everest?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q9" value="Alpy"> Alpy</label>
+                    <label><input type="radio" name="q9" value="Himalaje"> Himalaje</label>
+                    <label><input type="radio" name="q9" value="Andy"> Andy</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p data-question="q10">10. Które zwierzę jest symbolem inteligencji w wodzie?</p>
+                <div class="question-options">
+                    <label><input type="radio" name="q10" value="Delfin"> Delfin</label>
+                    <label><input type="radio" name="q10" value="Rekin"> Rekin</label>
+                    <label><input type="radio" name="q10" value="Wieloryb"> Wieloryb</label>
+                </div>
+            </div>
+
+            <button type="submit">Zakończ quiz</button>
+        </form>
+
+        <div id="results" class="result" style="display:none;"></div>
+
+        <div id="participantsList" class="participants">
+            <!-- Tutaj będą wyświetlane wyniki wszystkich uczestników -->
+        </div>
+    </div>
+</body>
+</html>
